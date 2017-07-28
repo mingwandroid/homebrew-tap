@@ -9,7 +9,7 @@ class Xpra < Formula
   env :userpaths
 
   depends_on :python
-  depends_on "Cython" => :python
+  # depends_on "Cython" => :python
   # PyObjC is used for AppKit - install core first to avoid recompilation
   depends_on "objc" => :python
   # PyOpenGL is only required if pygtkglext is to be used
