@@ -41,54 +41,15 @@ class Xpra < Formula
 end
 
 __END__
-diff --git a/xpra/platform/darwin/gui.py b/xpra/platform/darwin/gui.py
-index 52f0c6b..05fd0ec 100644
---- a/xpra/platform/darwin/gui.py
-+++ b/xpra/platform/darwin/gui.py
-@@ -39,9 +39,13 @@ def get_OSXApplication():
-     return macapp
- 
- try:
--    from Carbon import Snd      #@UnresolvedImport
-+    from AppKit import NSBeep       #@UnresolvedImport
- except:
--    Snd = None
-+    NSBeep = None
-+    try:
-+        from Carbon.Snd import SysBeep     #@UnresolvedImport
-+    except:
-+        SysBeep = None
- 
- 
- def do_init():
-@@ -75,10 +81,13 @@ def get_native_tray_classes():
-     return [OSXTray]
- 
- def system_bell(*args):
--    if Snd is None:
--        return False
--    Snd.SysBeep(1)
--    return True
-+    if NSBeep is not None:
-+        NSBeep()
-+        return True
-+    if SysBeep is not None:
-+        SysBeep(1)
-+        return True
-+    return False
- 
- #if there is an easier way of doing this, I couldn't find it:
- try:
 diff --git a/xpra/platform/darwin/paths.py b/xpra/platform/darwin/paths.py
-index 0f7137d..67990f3 100644
---- a/xpra/platform/darwin/paths.py
-+++ b/xpra/platform/darwin/paths.py
-@@ -18,7 +18,7 @@ def do_get_resources_dir():
+--- a/xpra/platform/darwin/paths.py	(revision 16443)
++++ b/xpra/platform/darwin/paths.py	(working copy)
+@@ -20,7 +20,7 @@
      RESOURCES = "/Resources/"
      #FUGLY warning: importing gtkosx_application causes the dock to appear,
      #and in some cases we don't want that.. so use the env var XPRA_SKIP_UI as workaround for such cases:
--    if os.environ.get("XPRA_SKIP_UI", "0")=="0":
-+    if os.environ.get("XPRA_SKIP_UI", "1")=="0":
+-    if not envbool("XPRA_SKIP_UI", False):
++    if not envbool("XPRA_SKIP_UI", True):
          try:
              import gtkosx_application        #@UnresolvedImport
              try:
